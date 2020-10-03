@@ -10,7 +10,7 @@ export class AppComponent {
   title = 'Angular-pwa';
 
   apiData: any;
-  public publicKey: 'BIa-vDuPs1XdOvvnrBEQ-4QLBWIwqlUxl2oHdst7auFhR-UVCFq-b6FsLXGTNj8g5Bcpo4ECg-82qazvwev511U';
+  public publicKey: string = 'BIa-vDuPs1XdOvvnrBEQ-4QLBWIwqlUxl2oHdst7auFhR-UVCFq-b6FsLXGTNj8g5Bcpo4ECg-82qazvwev511U';
   constructor(private http: HttpClient, private update: SwUpdate
     , private swPush: SwPush) {
     this.updateClient();
@@ -18,6 +18,12 @@ export class AppComponent {
 
   ngOnInit() {
     this.PushSubscription();
+    this.swPush.messages.subscribe((message) => console.log(message));
+    this.swPush.notificationClicks.subscribe(
+      ({action, notification }) => {
+        window.open(notification.data.url);
+      }
+    )
     this.http.get('http://dummy.restapiexample.com/api/v1/employees').subscribe(
       (res: any) => {
         this.apiData = res.data;
@@ -49,15 +55,16 @@ export class AppComponent {
 
   }
   PushSubscription() {
-    if (!this.swPush.isEnabled) {
-      console.log('Notification is not enabled');
-      return;
-    }
+    // if (!this.swPush.isEnabled) {
+    //   console.log('Notification is not enabled');
+    //   return;
+    // }
     this.swPush.requestSubscription({
       serverPublicKey: this.publicKey,
-    }).then(sub => { console.log(JSON.stringify(sub)); }).catch(err => console.log(err));
+    }).then(sub => {
+      console.log(JSON.stringify(sub));
+    }).catch(err =>
+      console.log(err));
   }
-
-
 
 }
